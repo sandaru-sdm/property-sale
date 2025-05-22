@@ -1,51 +1,50 @@
 package com.sdm.property_sale.controller;
 
-import com.sdm.property_sale.dto.UserDto;
-import com.sdm.property_sale.enums.Status;
-import com.sdm.property_sale.service.UserService;
-import com.sdm.property_sale.util.Constants;
+import com.sdm.property_sale.dto.UserRequestDto;
+import com.sdm.property_sale.dto.UserResponseDto;
+import com.sdm.property_sale.dto.UserStatusDto;
+import com.sdm.property_sale.service.AuthService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(Constants.USERS_PATH)
+@RequestMapping("/api/v1/")
+@Validated
 public class UserController {
+    private final AuthService authService;
 
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(AuthService authService) {
+        this.authService = authService;
     }
 
-    @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDto>> getUsers() {
+        List<UserResponseDto> users = authService.getUsers();
+        return ResponseEntity.ok().body(users);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDto> signUpUser(@Valid @RequestBody UserRequestDto userRegisterRequest){
+        UserResponseDto userDto = authService.createUser(userRegisterRequest);
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(
-            @PathVariable UUID id,
-            @Valid @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.updateUser(id, userDto));
+    @PutMapping("update/{id}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID id, @RequestBody UserRequestDto userRequestDto) {
+        UserResponseDto patientResponseDTO = authService.updateUser(id, userRequestDto);
+        return ResponseEntity.ok().body(patientResponseDTO);
     }
 
-    @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    public ResponseEntity<Void> changeUserStatus(
-            @PathVariable UUID id,
-            @RequestParam Status status) {
-        userService.changeUserStatus(id, status);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("status/{id}")
+    public ResponseEntity<UserResponseDto> updateStatus(@PathVariable UUID id, @RequestBody UserStatusDto statusDto) {
+        UserResponseDto response = authService.updateStatus(id, statusDto.isActivated());
+        return ResponseEntity.ok().body(response);
     }
+
 }

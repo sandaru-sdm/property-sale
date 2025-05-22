@@ -1,60 +1,57 @@
 package com.sdm.property_sale.entity;
 
-import com.sdm.property_sale.enums.Status;
-import com.sdm.property_sale.enums.UserType;
+import com.sdm.property_sale.dto.UserDto;
+import com.sdm.property_sale.enums.UserRole;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import java.security.Principal;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
-
+public class User implements UserDetails, Principal {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false, unique = true)
     private String mobile;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false)
     private String password;
+    private UserRole role;
+    private boolean isActivated = true;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserType userType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + userType.name()));
+    public UserDto getDto() {
+        UserDto dto = new UserDto();
+        dto.setId(id);
+        dto.setName(name);
+        dto.setEmail(email);
+        dto.setMobile(mobile);
+        dto.setRole(role);
+        return dto;
     }
 
     @Override
-    public String getPassword() {
-        return null;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(new SimpleGrantedAuthority("USER"));
+    }
+
+    @Override
+    public String getName() {
+        return email;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     @Override
@@ -74,7 +71,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return status == Status.ACTIVE;
+        return true;
     }
 
     public UUID getId() {
@@ -85,22 +82,6 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -109,27 +90,35 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public UserType getUserType() {
-        return userType;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setUserType(UserType userType) {
-        this.userType = userType;
+    public boolean isActivated() {
+        return isActivated;
     }
 
-    public Status getStatus() {
-        return status;
+    public void setActivated(boolean activated) {
+        isActivated = activated;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }

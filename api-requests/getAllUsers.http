@@ -1,0 +1,4 @@
+GET http://localhost:8081/api/v1/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiU1VQRVJfQURNSU4iLCJzdWIiOiJtYWR1aGFuc2FkaWxzaGFuQGdtYWlsLmNvbSIsImlhdCI6MTc0NzgzMjI0OSwiZXhwIjoxNzQ3OTE4NjQ5fQ.GbAaqqVz4A0e-rEP9QCbQHaDH42cNmiv9LdtnWDohTI
+

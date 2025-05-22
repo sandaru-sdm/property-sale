@@ -1,0 +1,9 @@
+PUT http://localhost:8080/api/v1/update/aa294255-0530-4a68-b410-28e88e52e7bd
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiU1VQRVJfQURNSU4iLCJzdWIiOiJtYWR1aGFuc2FkaWxzaGFuQGdtYWlsLmNvbSIsImlhdCI6MTc0NzgzMjI0OSwiZXhwIjoxNzQ3OTE4NjQ5fQ.GbAaqqVz4A0e-rEP9QCbQHaDH42cNmiv9LdtnWDohTI
+{
+  "name": "John Doe 1",
+  "mobile": "0754306610",
+  "email": "j0hndoe@gmail.com",
+  "userRole": "ADMIN"
+}

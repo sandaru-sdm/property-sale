@@ -1,6 +1,6 @@
 package com.sdm.property_sale.enums;
 
-public enum UserType {
+public enum UserRole {
     SUPER_ADMIN,
     ADMIN,
     USER
