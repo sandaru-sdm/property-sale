@@ -39,15 +39,19 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/authenticate").permitAll()
+                        .requestMatchers("/api/v1/images/**").permitAll() // Allow public access to images
                         .requestMatchers("/api/v1/register").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers("/api/v1/users").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers("/api/v1/update/").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers("/api/v1/status/").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/v1/update/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/api/v1/status/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/api/v1/property/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
+                        .requestMatchers("/api/v1/public/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -71,7 +75,7 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -85,7 +89,6 @@ public class WebSecurityConfiguration {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
         provider.setUserDetailsService(userDetailsService);
-
         return provider;
     }
 
@@ -93,5 +96,4 @@ public class WebSecurityConfiguration {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
