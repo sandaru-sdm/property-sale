@@ -11,8 +11,12 @@ import com.sdm.property_sale.mapper.UserMapper;
 import com.sdm.property_sale.repository.UserRepository;
 import com.sdm.property_sale.util.JwtUtil;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,8 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import org.json.JSONObject;
-import org.json.JSONException;
+import com.sdm.property_sale.dto.AuthResponseDto; // Added import
 
 import java.util.List;
 import java.util.Optional;
@@ -30,16 +33,33 @@ import java.util.UUID;
 @Service
 public class AuthService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
+    @Value("${admin.default.email}")
+    private String adminDefaultEmail;
+
+    @Value("${admin.default.name}")
+    private String adminDefaultName;
+
+    @Value("${admin.default.mobile}")
+    private String adminDefaultMobile;
+
+    @Value("${admin.default.password}")
+    private String adminDefaultPassword;
+
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtUtil jwtUtil) {
+    @Autowired
+    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserResponseDto> getUsers() {
@@ -70,16 +90,8 @@ public class AuthService {
             String jwt = jwtUtil.generateToken(userDetails.getUsername(), role.toString());
 
             if (user.isActivated()) {
-                try {
-                    JSONObject response = new JSONObject();
-                    response.put("userId", user.getId());
-                    response.put("userRole", user.getRole());
-                    response.put("token", jwt);
-                    response.put("tokenType", "Bearer");
-                    return ResponseEntity.ok(response.toString());
-                } catch (JSONException e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while creating response.");
-                }
+                AuthResponseDto authResponse = new AuthResponseDto(user.getId(), user.getRole(), jwt);
+                return ResponseEntity.ok(authResponse);
             } else {
                 return ResponseEntity.badRequest().body("Account is not activated.");
             }
@@ -103,14 +115,14 @@ public class AuthService {
         User adminAccount = userRepository.findByRole(UserRole.SUPER_ADMIN);
         if(adminAccount == null){
             User user = new User();
-            user.setEmail("maduhansadilshan@gmail.com");
-            user.setName("Sandaru Gunathilake");
-            user.setMobile("0701794934");
+            user.setEmail(adminDefaultEmail);
+            user.setName(adminDefaultName);
+            user.setMobile(adminDefaultMobile);
             user.setRole(UserRole.SUPER_ADMIN);
-            user.setPassword(new BCryptPasswordEncoder().encode("dilshan2000"));
+            user.setPassword(passwordEncoder.encode(adminDefaultPassword));
             userRepository.save(user);
         } else {
-            System.out.println("Admin Account is exist." + adminAccount);
+            logger.info("Admin account already exists for email: {}", adminAccount.getEmail());
         }
     }
 
@@ -127,7 +139,7 @@ public class AuthService {
         user.setMobile(userRequestDto.getMobile());
         user.setRole(userRequestDto.getUserRole());
         if (userRequestDto.getPassword() != null && !userRequestDto.getPassword().isBlank()) {
-            user.setPassword(new BCryptPasswordEncoder().encode(userRequestDto.getPassword()));
+            user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
         }
         User updatedUser = userRepository.save(user);
         return UserMapper.toResponseDto(updatedUser);
