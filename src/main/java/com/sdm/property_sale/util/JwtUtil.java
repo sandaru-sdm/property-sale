@@ -47,7 +47,6 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Add method to extract role from token
     public String extractRole(String token){
         Claims claims = extractAllClaims(token);
         return claims.get("role", String.class);

@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -82,18 +81,13 @@ public class AuthService {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while creating response.");
                 }
             } else {
-                return ResponseEntity.badRequest().body("Account is not activated. Check your email.");
+                return ResponseEntity.badRequest().body("Account is not activated.");
             }
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User not found.");
 
     }
-
-    public Boolean hasUserWithEmail(String email){
-        return userRepository.findByEmail(email).isPresent();
-    }
-
     public UserResponseDto createUser(UserRequestDto userRegisterRequest){
 
         if(userRepository.existsByEmail(userRegisterRequest.getEmail())) {
@@ -121,14 +115,20 @@ public class AuthService {
     }
 
     public UserResponseDto updateUser(UUID id, UserRequestDto userRequestDto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with ID : " + id));
-        if(userRepository.existsByEmailAndIdNot(userRequestDto.getEmail(), id)) {
-            throw new EmailAlreadyExistsException("A user with this email already exists : " + userRequestDto.getEmail());
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID : " + id));
+        if (userRequestDto.getEmail() != null && !userRequestDto.getEmail().isBlank()) {
+            if (userRepository.existsByEmailAndIdNot(userRequestDto.getEmail(), id)) {
+                throw new EmailAlreadyExistsException("A user with this email already exists : " + userRequestDto.getEmail());
+            }
+            user.setEmail(userRequestDto.getEmail());
         }
         user.setName(userRequestDto.getName());
-        user.setEmail(userRequestDto.getEmail());
         user.setMobile(userRequestDto.getMobile());
         user.setRole(userRequestDto.getUserRole());
+        if (userRequestDto.getPassword() != null && !userRequestDto.getPassword().isBlank()) {
+            user.setPassword(new BCryptPasswordEncoder().encode(userRequestDto.getPassword()));
+        }
         User updatedUser = userRepository.save(user);
         return UserMapper.toResponseDto(updatedUser);
     }
