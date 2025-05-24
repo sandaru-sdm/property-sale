@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserResponseDto> signUpUser(@Valid @RequestBody UserRequestDto userRegisterRequest){
         UserResponseDto userDto = authService.createUser(userRegisterRequest);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+        return new ResponseEntity<>(userDto, HttpStatus.CREATED);
     }
 
     @PutMapping("update/{id}")
