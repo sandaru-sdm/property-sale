@@ -6,13 +6,16 @@ import java.util.UUID;
 
 public class AuthResponseDto {
 
-    private UUID userId;
-    private UserRole userRole;
-    private String token;
-    private String tokenType = "Bearer"; // Default initialization
+    private final UUID userId;
+    private final String email;
+    private final String name;
+    private final UserRole userRole;
+    private final String token;
 
-    public AuthResponseDto(UUID userId, UserRole userRole, String token) {
+    public AuthResponseDto(UUID userId, String email, String name, UserRole userRole, String token) {
         this.userId = userId;
+        this.email = email;
+        this.name = name;
         this.userRole = userRole;
         this.token = token;
     }
@@ -30,6 +33,12 @@ public class AuthResponseDto {
     }
 
     public String getTokenType() {
-        return tokenType;
+        return "Bearer";
+    }
+    public String getEmail() {
+        return email;
+    }
+    public String getName() {
+        return name;
     }
 }

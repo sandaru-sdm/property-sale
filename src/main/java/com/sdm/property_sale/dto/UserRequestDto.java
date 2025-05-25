@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Size;
 public class UserRequestDto {
     @Email(message = "Invalid email format")
     private String email;
-    // @NotBlank was removed here.
     @Size(min = 8, message = "Password must be at least 8 characters long if provided")
     private String password;
     @NotBlank(message = "Name is mandatory")

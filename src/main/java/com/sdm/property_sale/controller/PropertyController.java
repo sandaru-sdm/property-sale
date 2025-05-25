@@ -21,6 +21,21 @@ public class PropertyController {
         this.propertyService = propertyService;
     }
 
+    @GetMapping("/{propertyId}")
+    public ResponseEntity<PropertyDto> getPropertyById(
+            @PathVariable Long propertyId) {
+        try {
+            PropertyDto property = propertyService.getPropertyById(propertyId);
+            if (property != null) {
+                return ResponseEntity.ok(property);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<PropertyDto> saveProperty(@Valid @RequestBody PropertyDto propertyDto) {
         try {
@@ -31,12 +46,12 @@ public class PropertyController {
         }
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update/{propertyId}")
     public ResponseEntity<PropertyDto> updateProperty(
-            @RequestParam Long propertyId,
+            @PathVariable Long propertyId,
             @Valid @RequestBody PropertyDto propertyDto) {
         try {
-            PropertyDto updatedProperty = propertyService.updateProperty(propertyId, propertyDto, propertyDto.getUserId());
+            PropertyDto updatedProperty = propertyService.updateProperty(propertyId, propertyDto);
             return ResponseEntity.ok(updatedProperty);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

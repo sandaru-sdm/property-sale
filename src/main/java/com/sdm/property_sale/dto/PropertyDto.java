@@ -10,7 +10,6 @@ import java.util.UUID;
 public class PropertyDto {
     private Long id;
 
-    @NotBlank(message = "Property name is required")
     @Size(max = 255, message = "Property name must not exceed 255 characters")
     private String name;
 

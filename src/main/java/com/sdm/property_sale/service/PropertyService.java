@@ -43,8 +43,8 @@ public class PropertyService {
         return propertyMapper.toDto(propertyRepository.findById(savedProperty.getId()).orElse(savedProperty));
     }
 
-    public PropertyDto updateProperty(Long propertyId, PropertyDto propertyDto, UUID userId) {
-        Optional<Property> existingProperty = propertyRepository.findByIdAndUserId(propertyId, userId);
+    public PropertyDto updateProperty(Long propertyId, PropertyDto propertyDto) {
+        Optional<Property> existingProperty = propertyRepository.findById(propertyId);
 
         if (existingProperty.isEmpty()) {
             throw new RuntimeException("Property not found or unauthorized access");
@@ -53,19 +53,6 @@ public class PropertyService {
         Property property = getProperty(propertyDto, existingProperty);
 
         Property savedProperty = propertyRepository.save(property);
-
-        // Update images if provided
-        if (propertyDto.getImages() != null) {
-            // Delete existing images
-            propertyImageRepository.deleteByPropertyId(propertyId);
-
-            // Save new images
-            for (PropertyImageDto imageDto : propertyDto.getImages()) {
-                PropertyImage image = propertyMapper.toImageEntity(imageDto);
-                image.setProperty(savedProperty);
-                propertyImageRepository.save(image);
-            }
-        }
 
         return propertyMapper.toDto(propertyRepository.findById(savedProperty.getId()).orElse(savedProperty));
     }

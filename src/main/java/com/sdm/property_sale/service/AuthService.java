@@ -90,7 +90,7 @@ public class AuthService {
             String jwt = jwtUtil.generateToken(userDetails.getUsername(), role.toString());
 
             if (user.isActivated()) {
-                AuthResponseDto authResponse = new AuthResponseDto(user.getId(), user.getRole(), jwt);
+                AuthResponseDto authResponse = new AuthResponseDto(user.getId(), user.getEmail(), user.getName(), user.getRole(), jwt);
                 return ResponseEntity.ok(authResponse);
             } else {
                 return ResponseEntity.badRequest().body("Account is not activated.");
@@ -154,4 +154,8 @@ public class AuthService {
     }
 
 
+    public UserResponseDto getUserById(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID : " + userId));;
+        return UserMapper.toResponseDto(user);
+    }
 }
