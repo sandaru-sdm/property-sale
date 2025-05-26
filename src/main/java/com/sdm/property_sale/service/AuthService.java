@@ -1,8 +1,6 @@
 package com.sdm.property_sale.service;
 
-import com.sdm.property_sale.dto.AuthenticationRequest;
-import com.sdm.property_sale.dto.UserRequestDto;
-import com.sdm.property_sale.dto.UserResponseDto;
+import com.sdm.property_sale.dto.*;
 import com.sdm.property_sale.entity.User;
 import com.sdm.property_sale.enums.UserRole;
 import com.sdm.property_sale.exception.EmailAlreadyExistsException;
@@ -13,6 +11,7 @@ import com.sdm.property_sale.util.JwtUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import com.sdm.property_sale.dto.AuthResponseDto; // Added import
 
 import java.util.List;
 import java.util.Optional;
@@ -145,17 +143,43 @@ public class AuthService {
         return UserMapper.toResponseDto(updatedUser);
     }
 
-    public UserResponseDto updateStatus(UUID id, boolean isActivated) {
+    public UserStatusResponseDto updateStatus(UUID id, UserStatusRequestDto dto) {
+        if (dto.getUserId() == null || !dto.getUserId().equals(id.toString())) {
+            throw new IllegalArgumentException("User ID in path and body do not match or is null");
+        }
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID : " + id));
-        user.setActivated(isActivated);
-        User updatedUser = userRepository.save(user);
-        return UserMapper.toResponseDto(updatedUser);
-    }
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + id));
 
+        String status = dto.getStatus().toUpperCase();
+        if (!status.equals("ACTIVATE") && !status.equals("DEACTIVATE")) {
+            throw new IllegalArgumentException("Status must be ACTIVATE or DEACTIVATE");
+        }
+        boolean isActivated = status.equals("ACTIVATE");
+
+        user.setActivated(isActivated);
+        userRepository.save(user);
+        UserStatusResponseDto userStatusResponseDto = new UserStatusResponseDto();
+        userStatusResponseDto.setUserId(dto.getUserId());
+        userStatusResponseDto.setRole(user.getRole().name());
+        userStatusResponseDto.setStatus(isActivated ? "ACTIVATED" : "DEACTIVATED");
+        return userStatusResponseDto;
+    }
 
     public UserResponseDto getUserById(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID : " + userId));;
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID : " + userId));
         return UserMapper.toResponseDto(user);
     }
+
+    public UserStatusResponseDto getUserStatusDtoById(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        UserStatusResponseDto dto = new UserStatusResponseDto();
+        dto.setUserId(user.getId().toString());
+        dto.setRole(user.getRole().name());
+        dto.setStatus(user.isActivated() ? "Activated" : "Deactivated");
+
+        return dto;
+    }
+
 }

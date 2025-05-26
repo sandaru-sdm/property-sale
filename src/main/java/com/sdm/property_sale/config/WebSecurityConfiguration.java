@@ -46,8 +46,9 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/api/v1/images/**").permitAll() // Allow public access to images
                         .requestMatchers("/api/v1/register").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers("/api/v1/users").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers("/api/v1/update/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers("/api/v1/status/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/api/v1/update/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/api/v1/user/status/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers("/api/v1/property/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .anyRequest().authenticated()
@@ -61,7 +62,7 @@ public class WebSecurityConfiguration {
     private CorsConfiguration buildCorsConfig() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(frontendUrl));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         return config;
