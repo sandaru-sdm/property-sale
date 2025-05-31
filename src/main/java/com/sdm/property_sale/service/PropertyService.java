@@ -117,4 +117,9 @@ public class PropertyService {
             throw new RuntimeException("Property not found or unauthorized access");
         }
     }
+
+    public List<PropertyDto> getUsersPropertiesByDistrict(UUID userId, String district) {
+        List<Property> properties = propertyRepository.findByUserIdAndMainCity(userId, district);
+        return propertyMapper.toDtoList(properties);
+    }
 }

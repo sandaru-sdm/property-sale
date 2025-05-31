@@ -44,4 +44,15 @@ public class PublicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/{userId}/properties")
+    public ResponseEntity<List<PropertyDto>> getUsersPropertiesByDistrict(
+            @PathVariable UUID userId,
+            @RequestParam(required = false) String district) {
+        if (district != null) {
+            return ResponseEntity.ok(propertyService.getUsersPropertiesByDistrict(userId, district));
+        } else {
+            return ResponseEntity.ok(propertyService.getPropertiesByUserId(userId));
+        }
+    }
 }

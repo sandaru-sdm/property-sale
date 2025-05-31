@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface PropertyRepository extends JpaRepository<Property, Long> {
     Optional<Property> findByIdAndUserId(Long id, UUID userId);
     List<Property> findByUserIdOrderByCreatedAtDesc(UUID userId);
+
+    List<Property> findByUserIdAndMainCity(UUID userId, String district);
 }

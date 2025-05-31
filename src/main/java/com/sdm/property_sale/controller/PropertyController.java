@@ -22,8 +22,7 @@ public class PropertyController {
     }
 
     @GetMapping("/{propertyId}")
-    public ResponseEntity<PropertyDto> getPropertyById(
-            @PathVariable Long propertyId) {
+    public ResponseEntity<PropertyDto> getPropertyById(@PathVariable Long propertyId) {
         try {
             PropertyDto property = propertyService.getPropertyById(propertyId);
             if (property != null) {
