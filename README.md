@@ -1,37 +1,39 @@
 
-# Property Sale
+# 🏡 Property Sale
 
 Property Sale is a Spring Boot application for listing, managing, and selling properties. It provides RESTful APIs for user authentication, property management, file uploads, and user administration. The backend is built with Java 17, Spring Boot, Spring Security, JPA, JWT, and MySQL.
 
-## Features
+---
 
-- User registration and authentication (JWT-based)
-- Role-based access control (Admin/User)
-- Add, update, and view properties
-- Upload property images and plans
-- Change user and property status
-- MySQL database integration
-- RESTful API endpoints
+## ✨ Features
 
-## Tech Stack
+- 👤 User registration and authentication (JWT-based)
+- 🔐 Role-based access control (Admin/User)
+- 🏠 Add, update, and view properties
+- 🖼️ Upload property images and plans
+- 🔄 Change user and property status
+- 🗄️ MySQL database integration
+- 🌐 RESTful API endpoints
 
-- Java 17
-- Spring Boot 3.4.5
-- Spring Security
-- Spring Data JPA
-- MySQL
-- JWT (JSON Web Token)
-- Maven
+## 🛠️ Tech Stack
 
-## Getting Started
+- ☕ Java 17
+- 🧰 Spring Boot 3.4.5
+- 🛡️ Spring Security
+- 🗃️ Spring Data JPA
+- 🗄️ MySQL
+- 🔑 JWT (JSON Web Token)
+- 📦 Maven
 
-### Prerequisites
+## 🚀 Getting Started
 
-- Java 17+
-- Maven
-- MySQL
+### 📋 Prerequisites
 
-### Setup
+- ☕ Java 17+
+- 📦 Maven
+- 🗄️ MySQL
+
+### ⚙️ Setup
 
 1. **Clone the repository:**
    ```sh
@@ -54,9 +56,9 @@ Property Sale is a Spring Boot application for listing, managing, and selling pr
 4. **Access the API:**
    - The server runs on `http://localhost:8080` by default.
 
-## API Endpoints
+## 📚 API Endpoints
 
-### Authentication
+### 🔑 Authentication
 
 #### Login
 ```http
@@ -68,7 +70,7 @@ Content-Type: application/json
 }
 ```
 
-### User Management
+### 👥 User Management
 
 #### Register User
 ```http
@@ -112,7 +114,7 @@ Content-Type: application/json
 }
 ```
 
-### Property Management
+### 🏠 Property Management
 
 #### Get Property by ID
 ```http
@@ -129,7 +131,7 @@ Content-Type: application/json
 }
 ```
 
-### File Upload
+### 📤 File Upload
 
 #### Upload Property Images
 ```http
@@ -139,11 +141,11 @@ landImages: [files]
 planImages: [files]
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 See `src/main/resources/application.properties` for all configuration options, including database, JWT, and file upload settings.
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
 
